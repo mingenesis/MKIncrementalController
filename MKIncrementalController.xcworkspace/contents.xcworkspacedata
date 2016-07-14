@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "container:"
+      name = "MKIncrementalController">
+      <FileRef
+         location = "group:MKIncrementalController/MKIncrementalController.h">
+      </FileRef>
+      <FileRef
+         location = "group:MKIncrementalController/MKIncrementalController.m">
+      </FileRef>
+      <FileRef
+         location = "group:MKIncrementalController/MKIncrementalReloadView.h">
+      </FileRef>
+      <FileRef
+         location = "group:MKIncrementalController/MKIncrementalReloadView.m">
+      </FileRef>
+      <FileRef
+         location = "group:MKIncrementalController/MKIncrementalErrorView.h">
+      </FileRef>
+      <FileRef
+         location = "group:MKIncrementalController/MKIncrementalErrorView.m">
+      </FileRef>
+      <FileRef
+         location = "group:MKIncrementalController/MKIncrementalLoadmoreView.h">
+      </FileRef>
+      <FileRef
+         location = "group:MKIncrementalController/MKIncrementalLoadmoreView.m">
+      </FileRef>
+   </Group>
+   <FileRef
+      location = "group:Example/Example.xcodeproj">
+   </FileRef>
+</Workspace>
