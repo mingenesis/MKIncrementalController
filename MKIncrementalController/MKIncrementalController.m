@@ -139,7 +139,7 @@ static void * ScrollViewContext = &ScrollViewContext;
     self.tableView.contentInset = insets;
     self.tableView.contentOffset = contentOffset;
     
-    if ([self.delegate respondsToSelector:@selector(incrementalController:fetchItemsWithCompletion:)]) {
+    if ([self.delegate respondsToSelector:@selector(incrementalController:fetchItemsForState:completion:)]) {
         void(^completionBlock)(NSArray * _Nullable, NSError * _Nullable) = ^(NSArray * _Nullable items, NSError * _Nullable error) {
             if (!self.tableView.dataSource) {
                 return;
@@ -176,7 +176,7 @@ static void * ScrollViewContext = &ScrollViewContext;
         
         self.completionBlock = completionBlock;
         
-        [self.delegate incrementalController:self fetchItemsWithCompletion:^(NSArray * _Nullable items, NSError * _Nullable error) {
+        [self.delegate incrementalController:self fetchItemsForState:self.state completion:^(NSArray * _Nullable items, NSError * _Nullable error) {
             if (completionBlock == self.completionBlock) {
                 completionBlock(items, error);
             }
@@ -208,7 +208,7 @@ static void * ScrollViewContext = &ScrollViewContext;
     
     [self updateTableFooterViewWithError:nil];
     
-    if ([self.delegate respondsToSelector:@selector(incrementalController:fetchItemsWithCompletion:)]) {
+    if ([self.delegate respondsToSelector:@selector(incrementalController:fetchItemsForState:completion:)]) {
         void(^completionBlock)(NSArray * _Nullable, NSError * _Nullable) = ^(NSArray * _Nullable items, NSError * _Nullable error) {
             if (!self.tableView.dataSource) {
                 return;
@@ -232,7 +232,7 @@ static void * ScrollViewContext = &ScrollViewContext;
         
         self.completionBlock = completionBlock;
         
-        [self.delegate incrementalController:self fetchItemsWithCompletion:^(NSArray * _Nullable items, NSError * _Nullable error) {
+        [self.delegate incrementalController:self fetchItemsForState:self.state completion:^(NSArray * _Nullable items, NSError * _Nullable error) {
             if (completionBlock == self.completionBlock) {
                 completionBlock(items, error);
             }

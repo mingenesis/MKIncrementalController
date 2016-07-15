@@ -11,7 +11,15 @@
 @implementation MKIncrementalReloadView
 
 + (CGFloat)minHeightForReload {
-    return 100;
+    return 50;
+}
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.backgroundColor = [UIColor redColor];
+    }
+    return self;
 }
 
 - (void)layoutSubviews {

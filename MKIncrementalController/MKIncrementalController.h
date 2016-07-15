@@ -45,7 +45,7 @@ typedef NS_ENUM(NSUInteger, MKIncrementalControllerState) {
 @protocol MKIncrementalControllerDelegate <NSObject>
 
 @optional
-- (void)incrementalController:(MKIncrementalController *)incrementalController fetchItemsWithCompletion:(void (^)( NSArray * _Nullable items,  NSError * _Nullable error))completion;
+- (void)incrementalController:(MKIncrementalController *)incrementalController fetchItemsForState:(MKIncrementalControllerState)state completion:(void (^)( NSArray * _Nullable items,  NSError * _Nullable error))completion;
 - (NSIndexPath *)incrementalController:(MKIncrementalController *)incrementalController indexPathForItemAtIndex:(NSUInteger)index;
 
 - (nullable __kindof UIView *)incrementalController:(MKIncrementalController *)incrementalController loadmoreViewForState:(MKIncrementalControllerState)state;
