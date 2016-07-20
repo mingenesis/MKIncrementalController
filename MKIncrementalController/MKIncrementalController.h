@@ -37,8 +37,8 @@ typedef NS_ENUM(NSUInteger, MKIncrementalControllerState) {
 @protocol MKIncrementalReloadView <NSObject>
 
 + (CGFloat)minHeightForReload;
-- (void)startLoading;
-- (void)stopLoading;
++ (CGFloat)heightForLoading;
+@property (nonatomic) BOOL loading;
 
 @end
 

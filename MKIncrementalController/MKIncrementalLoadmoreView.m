@@ -7,10 +7,11 @@
 //
 
 #import "MKIncrementalLoadmoreView.h"
+#import "MKIncrementalImage.h"
 
 @interface MKIncrementalLoadmoreView ()
 
-@property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UIImageView *imageView;
 
 @end
 
@@ -18,15 +19,24 @@
 
 + (instancetype)loadmoreViewWithState:(MKIncrementalControllerState)state {
     MKIncrementalLoadmoreView *view = [[MKIncrementalLoadmoreView alloc] initWithFrame:CGRectMake(0, 0, 10, 50)];
+    static UIImage *nomoreImage;
+    static NSArray *loadingImages;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        nomoreImage = [MKIncrementalImage imageForNoMoreWithSize:CGSizeMake(6, 6)];
+        loadingImages = [MKIncrementalImage imagesForLoadingWithSize:CGSizeMake(20, 20)];
+    });
     
     if (state == MKIncrementalControllerStateNoMore) {
-        view.titleLabel.text = @"已全部加载";
+        view.imageView.image = nomoreImage;
     }
     else if (state == MKIncrementalControllerStateLoadingMore) {
-        view.titleLabel.text = @"加载中…";
+        view.imageView.animationImages = loadingImages;
+        view.imageView.animationDuration = 1;
+        [view.imageView startAnimating];
     }
     else if (state == MKIncrementalControllerStateReloading || state == MKIncrementalControllerStateNotLoading) {
-        view.titleLabel.text = @"--";
+//        view.imageView.image = nil;
     }
     
     return view;
@@ -41,16 +51,14 @@
 }
 
 - (void)initialize {
-    UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    titleLabel.textAlignment = NSTextAlignmentCenter;
-    titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:titleLabel];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:nil];
+    imageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:imageView];
     
-    NSDictionary *vs = NSDictionaryOfVariableBindings(titleLabel);
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[titleLabel]|" options:0 metrics:nil views:vs]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[titleLabel]|" options:0 metrics:nil views:vs]];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterX multiplier:1 constant:0]];
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:imageView attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterY multiplier:1 constant:0]];
     
-    self.titleLabel = titleLabel;
+    self.imageView = imageView;
 }
 
 @end

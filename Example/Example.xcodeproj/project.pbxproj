@@ -17,6 +17,7 @@
 		401FA1D71D3774A100E63C4B /* MKIncrementalErrorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 401FA1D21D3774A100E63C4B /* MKIncrementalErrorView.m */; };
 		401FA1D81D3774A100E63C4B /* MKIncrementalReloadView.m in Sources */ = {isa = PBXBuildFile; fileRef = 401FA1D41D3774A100E63C4B /* MKIncrementalReloadView.m */; };
 		401FA1DB1D3774DA00E63C4B /* MKIncrementalLoadmoreView.m in Sources */ = {isa = PBXBuildFile; fileRef = 401FA1DA1D3774DA00E63C4B /* MKIncrementalLoadmoreView.m */; };
+		401FA1DE1D3C778E00E63C4B /* MKIncrementalImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 401FA1DD1D3C778E00E63C4B /* MKIncrementalImage.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,8 @@
 		401FA1D41D3774A100E63C4B /* MKIncrementalReloadView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MKIncrementalReloadView.m; path = MKIncrementalController/MKIncrementalReloadView.m; sourceTree = "<group>"; };
 		401FA1D91D3774DA00E63C4B /* MKIncrementalLoadmoreView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MKIncrementalLoadmoreView.h; path = MKIncrementalController/MKIncrementalLoadmoreView.h; sourceTree = "<group>"; };
 		401FA1DA1D3774DA00E63C4B /* MKIncrementalLoadmoreView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MKIncrementalLoadmoreView.m; path = MKIncrementalController/MKIncrementalLoadmoreView.m; sourceTree = "<group>"; };
+		401FA1DC1D3C778E00E63C4B /* MKIncrementalImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MKIncrementalImage.h; path = MKIncrementalController/MKIncrementalImage.h; sourceTree = "<group>"; };
+		401FA1DD1D3C778E00E63C4B /* MKIncrementalImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MKIncrementalImage.m; path = MKIncrementalController/MKIncrementalImage.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +114,8 @@
 				401FA1D21D3774A100E63C4B /* MKIncrementalErrorView.m */,
 				401FA1D91D3774DA00E63C4B /* MKIncrementalLoadmoreView.h */,
 				401FA1DA1D3774DA00E63C4B /* MKIncrementalLoadmoreView.m */,
+				401FA1DC1D3C778E00E63C4B /* MKIncrementalImage.h */,
+				401FA1DD1D3C778E00E63C4B /* MKIncrementalImage.m */,
 			);
 			name = MKIncrementalController;
 			path = ..;
@@ -190,6 +195,7 @@
 				401FA1AF1D34E11E00E63C4B /* ViewController.m in Sources */,
 				401FA1AC1D34E11E00E63C4B /* AppDelegate.m in Sources */,
 				401FA1DB1D3774DA00E63C4B /* MKIncrementalLoadmoreView.m in Sources */,
+				401FA1DE1D3C778E00E63C4B /* MKIncrementalImage.m in Sources */,
 				401FA1D61D3774A100E63C4B /* MKIncrementalController.m in Sources */,
 				401FA1D81D3774A100E63C4B /* MKIncrementalReloadView.m in Sources */,
 				401FA1A91D34E11E00E63C4B /* main.m in Sources */,

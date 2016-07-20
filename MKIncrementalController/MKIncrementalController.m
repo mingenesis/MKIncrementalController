@@ -124,13 +124,13 @@ static void * ScrollViewContext = &ScrollViewContext;
     __block MKIncrementalControllerState prevState = self.state;
     _state = MKIncrementalControllerStateReloading;
     
-    [self.reloadView startLoading];
+    self.reloadView.loading = YES;
     [self updateTableFooterViewWithError:nil];
     
     CGPoint contentOffset = self.tableView.contentOffset;
     UIEdgeInsets insets = self.tableView.scrollIndicatorInsets;
     
-    insets.top += [[self.reloadView class] minHeightForReload];
+    insets.top += [[self.reloadView class] heightForLoading];
     
     if (contentOffset.y > -insets.top) {
         contentOffset.y = - insets.top;
@@ -185,7 +185,7 @@ static void * ScrollViewContext = &ScrollViewContext;
 }
 
 - (void)endReload {
-    [self.reloadView stopLoading];
+    self.reloadView.loading = NO;
     
     CGPoint contentOffset = self.tableView.contentOffset;
     UIEdgeInsets insets = self.tableView.scrollIndicatorInsets;
