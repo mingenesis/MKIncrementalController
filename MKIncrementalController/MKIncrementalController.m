@@ -160,7 +160,7 @@ static void * ScrollViewContext = &ScrollViewContext;
             
             _state = items.count > 0 ? MKIncrementalControllerStateNotLoading : MKIncrementalControllerStateNoMore;
             
-            _items = [NSMutableArray arrayWithArray:items];
+            [_items setArray:items];
             
             [self.tableView reloadData];
             [self updateTableFooterViewWithError:nil];

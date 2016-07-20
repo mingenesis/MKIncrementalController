@@ -28,6 +28,12 @@
       <FileRef
          location = "group:MKIncrementalController/MKIncrementalLoadmoreView.m">
       </FileRef>
+      <FileRef
+         location = "group:MKIncrementalController/MKIncrementalImage.h">
+      </FileRef>
+      <FileRef
+         location = "group:MKIncrementalController/MKIncrementalImage.m">
+      </FileRef>
    </Group>
    <FileRef
       location = "group:Example/Example.xcodeproj">

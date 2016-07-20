@@ -24,13 +24,16 @@ typedef NS_ENUM(NSUInteger, MKIncrementalControllerState) {
 - (instancetype)initWithTableView:(UITableView *)tableView reloadView:(nullable __kindof UIView<MKIncrementalReloadView> *)reloadView NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly) MKIncrementalControllerState state;
-@property (nullable, nonatomic, strong, readonly) NSMutableArray *items;
+@property (nullable, nonatomic, strong) NSMutableArray *items;
 
 @property (nullable, nonatomic, weak) id <MKIncrementalControllerDelegate> delegate;
 
 - (void)loadmore;
 - (void)reload;
 - (void)cancelLoading;
+
+/* Call this when self.items changes. */
+- (void)updateTableFooterViewWithError:(NSError *)error;
 
 @end
 
