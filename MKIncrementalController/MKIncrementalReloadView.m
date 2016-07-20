@@ -20,7 +20,7 @@
 @synthesize loading = _loading;
 
 + (CGFloat)minHeightForReload {
-    return 100;
+    return 80;
 }
 
 + (CGFloat)heightForLoading {
