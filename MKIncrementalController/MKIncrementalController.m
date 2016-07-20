@@ -111,7 +111,7 @@ static void * ScrollViewContext = &ScrollViewContext;
 }
 
 - (void)cancelLoading {
-    
+    self.completionBlock = nil;
 }
 
 #pragma mark - Reload
@@ -141,10 +141,6 @@ static void * ScrollViewContext = &ScrollViewContext;
     
     if ([self.delegate respondsToSelector:@selector(incrementalController:fetchItemsForState:completion:)]) {
         void(^completionBlock)(NSArray * _Nullable, NSError * _Nullable) = ^(NSArray * _Nullable items, NSError * _Nullable error) {
-            if (!self.tableView.dataSource) {
-                return;
-            }
-            
             if (error) {
                 if (self.items.count == 0) {
                     _state = MKIncrementalControllerStateNoMore;
@@ -177,7 +173,7 @@ static void * ScrollViewContext = &ScrollViewContext;
         self.completionBlock = completionBlock;
         
         [self.delegate incrementalController:self fetchItemsForState:self.state completion:^(NSArray * _Nullable items, NSError * _Nullable error) {
-            if (completionBlock == self.completionBlock) {
+            if (completionBlock == self.completionBlock && self.tableView.dataSource) {
                 completionBlock(items, error);
             }
         }];
@@ -210,10 +206,6 @@ static void * ScrollViewContext = &ScrollViewContext;
     
     if ([self.delegate respondsToSelector:@selector(incrementalController:fetchItemsForState:completion:)]) {
         void(^completionBlock)(NSArray * _Nullable, NSError * _Nullable) = ^(NSArray * _Nullable items, NSError * _Nullable error) {
-            if (!self.tableView.dataSource) {
-                return;
-            }
-            
             if (error) {
                 _state = MKIncrementalControllerStateNotLoading;
                 [self updateTableFooterViewWithError:nil];
@@ -233,7 +225,7 @@ static void * ScrollViewContext = &ScrollViewContext;
         self.completionBlock = completionBlock;
         
         [self.delegate incrementalController:self fetchItemsForState:self.state completion:^(NSArray * _Nullable items, NSError * _Nullable error) {
-            if (completionBlock == self.completionBlock) {
+            if (completionBlock == self.completionBlock && self.tableView.dataSource) {
                 completionBlock(items, error);
             }
         }];
