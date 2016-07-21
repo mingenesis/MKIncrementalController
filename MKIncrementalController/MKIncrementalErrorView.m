@@ -8,6 +8,8 @@
 
 #import "MKIncrementalErrorView.h"
 
+NSString * const MKIncrementalErrorDomain = @"MKIncrementalErrorDomain";
+
 @interface MKIncrementalErrorView ()
 
 @property (nonatomic, strong) UILabel *titleLabel;
@@ -35,6 +37,7 @@
 - (void)initialize {
     UILabel *titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     titleLabel.textAlignment = NSTextAlignmentCenter;
+    titleLabel.numberOfLines = 0;
     titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:titleLabel];
     

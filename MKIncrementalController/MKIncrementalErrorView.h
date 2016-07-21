@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
+FOUNDATION_EXPORT NSString * const MKIncrementalErrorDomain;
+
+NS_ENUM(NSInteger) {
+    MKIncrementalErrorEmpty = -1,
+};
+
 @interface MKIncrementalErrorView : UIView
 
 + (instancetype)errorViewWithError:(NSError *)error;

@@ -93,7 +93,7 @@ static void * ScrollViewContext = &ScrollViewContext;
                     footerView = [self.delegate emptyViewForIncrementalController:self];
                 }
                 else {
-                    footerView = [MKIncrementalErrorView errorViewWithError:[NSError errorWithDomain:@"" code:0 userInfo:@{NSLocalizedDescriptionKey: (self.emptyMessage ?: @"No data")}]];
+                    footerView = [MKIncrementalErrorView errorViewWithError:[NSError errorWithDomain:MKIncrementalErrorDomain code:MKIncrementalErrorEmpty userInfo:@{NSLocalizedDescriptionKey: (self.emptyMessage ?: @"No data")}]];
                 }
             }
             else {
