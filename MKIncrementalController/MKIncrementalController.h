@@ -35,6 +35,8 @@ typedef NS_ENUM(NSUInteger, MKIncrementalControllerState) {
 /* Call this when self.items changes. */
 - (void)updateTableFooterViewWithError:(nullable NSError *)error;
 
+@property (nullable, nonatomic, strong) NSString *emptyMessage;
+
 @end
 
 @protocol MKIncrementalReloadView <NSObject>
