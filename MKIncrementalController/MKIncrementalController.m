@@ -160,13 +160,22 @@ static void * ScrollViewContext = &ScrollViewContext;
             
             _state = items.count > 0 ? MKIncrementalControllerStateNotLoading : MKIncrementalControllerStateNoMore;
             
-            [_items setArray:items];
+            if (self.items) {
+                [self.items setArray:items];
+            }
+            else {
+                _items = [NSMutableArray arrayWithArray:items];
+            }
             
             [self.tableView reloadData];
             [self updateTableFooterViewWithError:nil];
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self endReload];
+                
+                if ([self.delegate respondsToSelector:@selector(incrementalController:didSucceedFetchItems:)]) {
+                    [self.delegate incrementalController:self didSucceedFetchItems:items];
+                }
             });
         };
         
@@ -219,6 +228,10 @@ static void * ScrollViewContext = &ScrollViewContext;
                 
                 [self insertItems:items];
                 [self updateTableFooterViewWithError:nil];
+                
+                if ([self.delegate respondsToSelector:@selector(incrementalController:didSucceedFetchItems:)]) {
+                    [self.delegate incrementalController:self didSucceedFetchItems:items];
+                }
             }
         };
         

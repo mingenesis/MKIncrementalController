@@ -35,6 +35,24 @@
     [self.incrementalController reload];
 }
 
+- (void)loadDataWithOffset:(NSUInteger)offset size:(NSUInteger)size completion:(nonnull void (^)(NSArray * _Nullable, NSError * _Nullable))completion {
+    NSMutableArray *data = [NSMutableArray array];
+    NSDateFormatter *dateFormater = [[NSDateFormatter alloc] init];
+    dateFormater.dateStyle = kCFDateFormatterFullStyle;
+    dateFormater.timeStyle = kCFDateFormatterMediumStyle;
+    
+    for (NSInteger idx = 0; idx < size; idx ++) {
+        if (offset < 90) {
+            NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:(offset + idx) * 9999999];
+            [data addObject:[dateFormater stringFromDate:date]];
+        }
+    }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        completion(data, nil);
+    });
+}
+
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -53,21 +71,8 @@
 
 - (void)incrementalController:(MKIncrementalController *)incrementalController fetchItemsForState:(MKIncrementalControllerState)state completion:(nonnull void (^)(NSArray * _Nullable, NSError * _Nullable))completion {
     NSUInteger offset = state == MKIncrementalControllerStateReloading ? 0 : incrementalController.items.count;
-    NSMutableArray *data = [NSMutableArray array];
-    NSDateFormatter *dateFormater = [[NSDateFormatter alloc] init];
-    dateFormater.dateStyle = kCFDateFormatterFullStyle;
-    dateFormater.timeStyle = kCFDateFormatterMediumStyle;
     
-    for (NSInteger idx = 0; idx < 20; idx ++) {
-        if (offset < 90) {
-            NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:(offset + idx) * 9999999];
-            [data addObject:[dateFormater stringFromDate:date]];
-        }
-    }
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        completion(data, nil);
-    });
+    [self loadDataWithOffset:offset size:20 completion:completion];
 }
 
 @end

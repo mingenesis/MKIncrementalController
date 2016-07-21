@@ -24,7 +24,7 @@ typedef NS_ENUM(NSUInteger, MKIncrementalControllerState) {
 - (instancetype)initWithTableView:(UITableView *)tableView reloadView:(nullable __kindof UIView<MKIncrementalReloadView> *)reloadView NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly) MKIncrementalControllerState state;
-@property (nullable, nonatomic, strong) NSMutableArray *items;
+@property (nullable, nonatomic, strong, readonly) NSMutableArray *items;
 
 @property (nullable, nonatomic, weak) id <MKIncrementalControllerDelegate> delegate;
 
@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger, MKIncrementalControllerState) {
 - (void)cancelLoading;
 
 /* Call this when self.items changes. */
-- (void)updateTableFooterViewWithError:(NSError *)error;
+- (void)updateTableFooterViewWithError:(nullable NSError *)error;
 
 @end
 
@@ -49,6 +49,7 @@ typedef NS_ENUM(NSUInteger, MKIncrementalControllerState) {
 
 @optional
 - (void)incrementalController:(MKIncrementalController *)incrementalController fetchItemsForState:(MKIncrementalControllerState)state completion:(void (^)( NSArray * _Nullable items,  NSError * _Nullable error))completion;
+- (void)incrementalController:(MKIncrementalController *)incrementalController didSucceedFetchItems:(NSArray *)items;
 - (NSIndexPath *)incrementalController:(MKIncrementalController *)incrementalController indexPathForItemAtIndex:(NSUInteger)index;
 
 - (nullable __kindof UIView *)incrementalController:(MKIncrementalController *)incrementalController loadmoreViewForState:(MKIncrementalControllerState)state;
