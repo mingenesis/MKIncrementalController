@@ -138,6 +138,10 @@ static void * ScrollViewContext = &ScrollViewContext;
     self.reloadView.loading = YES;
     [self updateTableFooterViewWithError:nil];
     
+    if (!self.items) {
+        _items = [NSMutableArray array];
+    }
+    
     CGPoint contentOffset = self.tableView.contentOffset;
     UIEdgeInsets insets = self.tableView.scrollIndicatorInsets;
     
@@ -173,9 +177,6 @@ static void * ScrollViewContext = &ScrollViewContext;
             
             _state = items.count == 0 ? MKIncrementalControllerStateNoMore : MKIncrementalControllerStateNotLoading;
             
-            if (!self.items) {
-                _items = [NSMutableArray array];
-            }
             [self.items setArray:items];
             
             [self.tableView reloadData];
