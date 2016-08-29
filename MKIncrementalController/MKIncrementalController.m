@@ -20,6 +20,7 @@ static void * ScrollViewContext = &ScrollViewContext;
 @property (nonatomic, strong) NSLayoutConstraint *reloadViewTopConstraint;
 @property (nonatomic, strong) NSLayoutConstraint *reloadViewHeightConstraint;
 
+@property (nonatomic) MKIncrementalControllerState prevState;
 @property (nonatomic, strong) void (^completionBlock)(NSArray *items, NSError *error);
 
 @end
@@ -78,17 +79,17 @@ static void * ScrollViewContext = &ScrollViewContext;
 - (void)updateTableFooterViewWithError:(NSError *)error {
     UIView *footerView;
     
-    if (error) {
-        if ([self.delegate respondsToSelector:@selector(incrementalController:errorViewForError:)]) {
-            footerView = [self.delegate incrementalController:self errorViewForError:error];
-        }
-        else {
-            footerView = [MKIncrementalErrorView errorViewWithError:error];
-        }
-    }
-    else {
-        if (self.items) {
-            if (self.items.count == 0) {
+    if (self.items) {
+        if (self.items.count == 0) {
+            if (error) {
+                if ([self.delegate respondsToSelector:@selector(incrementalController:errorViewForError:)]) {
+                    footerView = [self.delegate incrementalController:self errorViewForError:error];
+                }
+                else {
+                    footerView = [MKIncrementalErrorView errorViewWithError:error];
+                }
+            }
+            else {
                 if ([self.delegate respondsToSelector:@selector(emptyViewForIncrementalController:)]) {
                     footerView = [self.delegate emptyViewForIncrementalController:self];
                 }
@@ -96,13 +97,13 @@ static void * ScrollViewContext = &ScrollViewContext;
                     footerView = [MKIncrementalErrorView errorViewWithError:[NSError errorWithDomain:MKIncrementalErrorDomain code:MKIncrementalErrorEmpty userInfo:@{NSLocalizedDescriptionKey: (self.emptyMessage ?: @"No data")}]];
                 }
             }
+        }
+        else {
+            if ([self.delegate respondsToSelector:@selector(incrementalController:loadmoreViewForState:)]) {
+                footerView = [self.delegate incrementalController:self loadmoreViewForState:self.state];
+            }
             else {
-                if ([self.delegate respondsToSelector:@selector(incrementalController:loadmoreViewForState:)]) {
-                    footerView = [self.delegate incrementalController:self loadmoreViewForState:self.state];
-                }
-                else {
-                    footerView = [MKIncrementalLoadmoreView loadmoreViewWithState:self.state];
-                }
+                footerView = [MKIncrementalLoadmoreView loadmoreViewWithState:self.state];
             }
         }
     }
@@ -111,7 +112,17 @@ static void * ScrollViewContext = &ScrollViewContext;
 }
 
 - (void)cancelLoading {
-    self.completionBlock = nil;
+    MKIncrementalControllerState state = self.state;
+    
+    if (state == MKIncrementalControllerStateLoadingMore || state == MKIncrementalControllerStateReloading) {
+        _state = self.prevState;
+        self.completionBlock = nil;
+        
+        [self updateTableFooterViewWithError:nil];
+        if (state == MKIncrementalControllerStateReloading) {
+            [self endReload];
+        }
+    }
 }
 
 #pragma mark - Reload
@@ -121,7 +132,7 @@ static void * ScrollViewContext = &ScrollViewContext;
         return;
     }
     
-    __block MKIncrementalControllerState prevState = self.state;
+    _prevState = self.state;
     _state = MKIncrementalControllerStateReloading;
     
     self.reloadView.loading = YES;
@@ -141,16 +152,18 @@ static void * ScrollViewContext = &ScrollViewContext;
     
     if ([self.delegate respondsToSelector:@selector(incrementalController:fetchItemsForState:completion:)]) {
         void(^completionBlock)(NSArray * _Nullable, NSError * _Nullable) = ^(NSArray * _Nullable items, NSError * _Nullable error) {
+            self.completionBlock = nil;
+            
+            if (!self.tableView.dataSource) {
+                return;
+            }
+            
             if (error) {
-                if (self.items.count == 0) {
-                    _state = MKIncrementalControllerStateNoMore;
-                    [self updateTableFooterViewWithError:error];
-                } else {
-                    _state = prevState;
-                    [self updateTableFooterViewWithError:nil];
-                }
+                _state = self.items.count == 0 ? MKIncrementalControllerStateNoMore : self.prevState;
                 
+                [self updateTableFooterViewWithError:error];
                 [self endReload];
+                
                 return;
             }
             
@@ -158,19 +171,17 @@ static void * ScrollViewContext = &ScrollViewContext;
                 items = @[];
             }
             
-            _state = items.count > 0 ? MKIncrementalControllerStateNotLoading : MKIncrementalControllerStateNoMore;
+            _state = items.count == 0 ? MKIncrementalControllerStateNoMore : MKIncrementalControllerStateNotLoading;
             
-            if (self.items) {
-                [self.items setArray:items];
+            if (!self.items) {
+                _items = [NSMutableArray array];
             }
-            else {
-                _items = [NSMutableArray arrayWithArray:items];
-            }
+            [self.items setArray:items];
             
             [self.tableView reloadData];
-            [self updateTableFooterViewWithError:nil];
             
             dispatch_async(dispatch_get_main_queue(), ^{
+                [self updateTableFooterViewWithError:nil];
                 [self endReload];
                 
                 if ([self.delegate respondsToSelector:@selector(incrementalController:didSucceedFetchItems:)]) {
@@ -182,7 +193,7 @@ static void * ScrollViewContext = &ScrollViewContext;
         self.completionBlock = completionBlock;
         
         [self.delegate incrementalController:self fetchItemsForState:self.state completion:^(NSArray * _Nullable items, NSError * _Nullable error) {
-            if (completionBlock == self.completionBlock && self.tableView.dataSource) {
+            if (completionBlock == self.completionBlock) {
                 completionBlock(items, error);
             }
         }];
@@ -209,36 +220,45 @@ static void * ScrollViewContext = &ScrollViewContext;
         return;
     }
     
+    _prevState = self.state;
     _state = MKIncrementalControllerStateLoadingMore;
     
     [self updateTableFooterViewWithError:nil];
     
     if ([self.delegate respondsToSelector:@selector(incrementalController:fetchItemsForState:completion:)]) {
         void(^completionBlock)(NSArray * _Nullable, NSError * _Nullable) = ^(NSArray * _Nullable items, NSError * _Nullable error) {
-            if (error) {
-                _state = MKIncrementalControllerStateNotLoading;
-                [self updateTableFooterViewWithError:nil];
+            self.completionBlock = nil;
+            
+            if (!self.tableView.dataSource) {
+                return;
             }
-            else {
-                if (!items) {
-                    items = @[];
-                }
+            
+            if (error) {
+                _state = self.prevState;
                 
-                _state = items.count > 0 ? MKIncrementalControllerStateNotLoading : MKIncrementalControllerStateNoMore;
+                [self updateTableFooterViewWithError:error];
                 
-                [self insertItems:items];
-                [self updateTableFooterViewWithError:nil];
-                
-                if ([self.delegate respondsToSelector:@selector(incrementalController:didSucceedFetchItems:)]) {
-                    [self.delegate incrementalController:self didSucceedFetchItems:items];
-                }
+                return;
+            }
+            
+            if (!items) {
+                items = @[];
+            }
+            
+            _state = items.count == 0 ? MKIncrementalControllerStateNoMore : MKIncrementalControllerStateNotLoading;
+            
+            [self insertItems:items];
+            [self updateTableFooterViewWithError:nil];
+            
+            if ([self.delegate respondsToSelector:@selector(incrementalController:didSucceedFetchItems:)]) {
+                [self.delegate incrementalController:self didSucceedFetchItems:items];
             }
         };
         
         self.completionBlock = completionBlock;
         
         [self.delegate incrementalController:self fetchItemsForState:self.state completion:^(NSArray * _Nullable items, NSError * _Nullable error) {
-            if (completionBlock == self.completionBlock && self.tableView.dataSource) {
+            if (completionBlock == self.completionBlock) {
                 completionBlock(items, error);
             }
         }];
