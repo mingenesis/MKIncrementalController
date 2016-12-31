@@ -68,12 +68,12 @@ static void * ScrollViewContext = &ScrollViewContext;
     self.tableView.backgroundView = bgView;
     [self updateTableFooterViewWithError:nil];
     
-    [self.tableView addObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:ScrollViewContext];
+    [self.tableView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:ScrollViewContext];
     [self.tableView.panGestureRecognizer addTarget:self action:@selector(handlePanTableView:)];
 }
 
 - (void)dealloc {
-    [self.tableView removeObserver:self forKeyPath:NSStringFromSelector(@selector(contentOffset)) context:ScrollViewContext];
+    [self.tableView removeObserver:self forKeyPath:@"contentOffset" context:ScrollViewContext];
 }
 
 - (void)updateTableFooterViewWithError:(NSError *)error {
@@ -155,18 +155,21 @@ static void * ScrollViewContext = &ScrollViewContext;
     self.tableView.contentOffset = contentOffset;
     
     if ([self.delegate respondsToSelector:@selector(incrementalController:fetchItemsForState:completion:)]) {
+        __weak __typeof(self)weakSelf = self;
         void(^completionBlock)(NSArray * _Nullable, NSError * _Nullable) = ^(NSArray * _Nullable items, NSError * _Nullable error) {
-            self.completionBlock = nil;
+            __strong __typeof(weakSelf)strongSelf = weakSelf;
             
-            if (!self.tableView.dataSource) {
+            strongSelf.completionBlock = nil;
+            
+            if (!strongSelf.tableView.dataSource) {
                 return;
             }
             
             if (error) {
-                _state = self.items.count == 0 ? MKIncrementalControllerStateNoMore : self.prevState;
+                _state = strongSelf.items.count == 0 ? MKIncrementalControllerStateNoMore : strongSelf.prevState;
                 
-                [self updateTableFooterViewWithError:error];
-                [self endReload];
+                [strongSelf updateTableFooterViewWithError:error];
+                [strongSelf endReload];
                 
                 return;
             }
@@ -177,16 +180,16 @@ static void * ScrollViewContext = &ScrollViewContext;
             
             _state = items.count == 0 ? MKIncrementalControllerStateNoMore : MKIncrementalControllerStateNotLoading;
             
-            [self.items setArray:items];
+            [strongSelf.items setArray:items];
             
-            [self.tableView reloadData];
+            [strongSelf.tableView reloadData];
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self updateTableFooterViewWithError:nil];
-                [self endReload];
+                [strongSelf updateTableFooterViewWithError:nil];
+                [strongSelf endReload];
                 
-                if ([self.delegate respondsToSelector:@selector(incrementalController:didSucceedFetchItems:)]) {
-                    [self.delegate incrementalController:self didSucceedFetchItems:items];
+                if ([strongSelf.delegate respondsToSelector:@selector(incrementalController:didSucceedFetchItems:)]) {
+                    [strongSelf.delegate incrementalController:strongSelf didSucceedFetchItems:items];
                 }
             });
         };
@@ -227,17 +230,20 @@ static void * ScrollViewContext = &ScrollViewContext;
     [self updateTableFooterViewWithError:nil];
     
     if ([self.delegate respondsToSelector:@selector(incrementalController:fetchItemsForState:completion:)]) {
+        __weak __typeof(self)weakSelf = self;
         void(^completionBlock)(NSArray * _Nullable, NSError * _Nullable) = ^(NSArray * _Nullable items, NSError * _Nullable error) {
-            self.completionBlock = nil;
+            __strong __typeof(weakSelf)strongSelf = weakSelf;
             
-            if (!self.tableView.dataSource) {
+            strongSelf.completionBlock = nil;
+            
+            if (!strongSelf.tableView.dataSource) {
                 return;
             }
             
             if (error) {
-                _state = self.prevState;
+                _state = strongSelf.prevState;
                 
-                [self updateTableFooterViewWithError:error];
+                [strongSelf updateTableFooterViewWithError:error];
                 
                 return;
             }
@@ -248,11 +254,11 @@ static void * ScrollViewContext = &ScrollViewContext;
             
             _state = items.count == 0 ? MKIncrementalControllerStateNoMore : MKIncrementalControllerStateNotLoading;
             
-            [self insertItems:items];
-            [self updateTableFooterViewWithError:nil];
+            [strongSelf insertItems:items];
+            [strongSelf updateTableFooterViewWithError:nil];
             
-            if ([self.delegate respondsToSelector:@selector(incrementalController:didSucceedFetchItems:)]) {
-                [self.delegate incrementalController:self didSucceedFetchItems:items];
+            if ([strongSelf.delegate respondsToSelector:@selector(incrementalController:didSucceedFetchItems:)]) {
+                [strongSelf.delegate incrementalController:strongSelf didSucceedFetchItems:items];
             }
         };
         
@@ -332,11 +338,13 @@ static void * ScrollViewContext = &ScrollViewContext;
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context {
     if (context == ScrollViewContext) {
-        CGPoint prevOffset = [change[NSKeyValueChangeOldKey] CGPointValue];
-        CGPoint newOffset = [change[NSKeyValueChangeNewKey] CGPointValue];
-        
-        if (prevOffset.y != newOffset.y) {
-            [self scrollTableView:newOffset.y direction:newOffset.y > prevOffset.y];
+        if ([keyPath isEqualToString:@"contentOffset"]) {
+            CGPoint prevOffset = [change[NSKeyValueChangeOldKey] CGPointValue];
+            CGPoint newOffset = [change[NSKeyValueChangeNewKey] CGPointValue];
+            
+            if (prevOffset.y != newOffset.y) {
+                [self scrollTableView:newOffset.y direction:newOffset.y > prevOffset.y];
+            }
         }
     }
 }
